@@ -1,0 +1,152 @@
+/* Paleta Dinero Ya S.R.L. con modo claro y oscuro.
+   El header y sidebar mantienen la identidad de marca (verde + dorado)
+   en ambos modos. Los fondos de contenido si cambian con el tema. */
+
+@import "tailwindcss";
+
+/* Registrar la variante dark. Tailwind v4 no la trae por default.
+   Se activa cuando <html> tiene la clase .dark. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Colores de marca Dinero Ya. Fijos, no cambian con el tema. */
+  --color-dy-green-950: #081608;
+  --color-dy-green-900: #0f2910;
+  --color-dy-green-800: #1a3a1a;
+  --color-dy-green-700: #2a5a2a;
+  --color-dy-gold-600: #b18d1f;
+  --color-dy-gold-500: #c9a227;
+  --color-dy-gold-400: #d9b54a;
+  --color-dy-gold-300: #e8c968;
+  
+  /* El dorado oscuro para texto en modo oscuro, para buen contraste*/
+  --color-dy-gold-foreground: #0a0f0a;
+
+  /* Tokens semanticos para tema CLARO (default).
+     Fondos blancos/grises, texto oscuro. Neutro para lectura prolongada. */
+  --color-background: #ffffff;
+  --color-foreground: #171717;
+
+  --color-card: #ffffff;
+  --color-card-foreground: #171717;
+
+  --color-muted: #f5f5f5;
+  --color-muted-foreground: #6b7280;
+
+  --color-border: #e5e7eb;
+  --color-input: #e5e7eb;
+  --color-ring: #1a3a1a;
+
+  --color-primary: #1a3a1a;
+  --color-primary-foreground: #ffffff;
+
+  --color-accent: #c9a227;
+  --color-accent-foreground: #0a0a0a;
+
+  --color-destructive: #dc2626;
+  --color-destructive-foreground: #ffffff;
+
+  /* Header y sidebar: colores de MARCA, fijos.
+     Verde oscuro con texto blanco y dorado como acento, siempre.
+     No cambian con el tema para preservar la identidad visual. */
+  --color-header-bg: #1a3a1a;
+  --color-header-fg: #ffffff;
+  --color-header-accent: #c9a227;
+  --color-header-muted: rgba(255, 255, 255, 0.7);
+  --color-header-border: rgba(201, 162, 39, 0.25);
+
+  /* Tipografia */
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+
+  /* Radios */
+  --radius-sm: 0.25rem;
+  --radius: 0.5rem;
+  --radius-lg: 0.75rem;
+}
+
+/* Modo OSCURO estilo Claude: fondo verde casi negro, cards un tono mas claro,
+   texto claro con alto contraste. El dorado gana protagonismo como acento. */
+.dark {
+  --color-background: #131613;
+  --color-foreground: #f0f0ef;
+
+  --color-card: #1b1f1b;
+  --color-card-foreground: #f0f0ef;
+
+  --color-muted: #222722;
+  --color-muted-foreground: #9ca39c;
+
+  --color-border: #2a302a;
+  --color-input: #2a302a;
+  --color-ring: #c9a227;
+
+  /* En oscuro el primario se vuelve dorado porque el verde oscuro
+     pierde visibilidad contra el fondo casi negro. */
+  --color-primary: #c9a227;
+  --color-primary-foreground: #0a0f0a;
+
+  --color-accent: #2a5a2a;
+  --color-accent-foreground: #f0f0ef;
+
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #f0f0ef;
+
+  /* Header en modo oscuro: un poco MAS oscuro que en claro, para fundirse
+     ligeramente con el fondo pero seguir siendo reconocible como barra. */
+  --color-header-bg: #0f2910;
+  --color-header-fg: #ffffff;
+  --color-header-accent: #d9b54a;
+  --color-header-muted: rgba(255, 255, 255, 0.75);
+  --color-header-border: rgba(217, 181, 74, 0.25);
+}
+
+/* Estilos base. Aplicamos border y colores a nivel html/body. */
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    transition: background-color 200ms ease, color 200ms ease;
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    min-height: 100vh;
+  }
+
+  /* Animaciones globales reutilizadas por modales y toasts.
+   Definir aqui en lugar de styled-jsx evita hydration mismatch. */
+  @keyframes dyFadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes dyModalSlideIn {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -48%) scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+
+  @keyframes dyToastSlideIn {
+    from {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+}
