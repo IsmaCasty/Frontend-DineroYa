@@ -1,6 +1,5 @@
 // Wrapper de un campo de formulario: label + input/select + error.
-// Uso intencional para mantener consistencia visual en TODOS los formularios
-// del sistema (crear usuario, editar cliente, registrar prestamo, etc.).
+// Uso intencional para mantener consistencia visual en TODOS los formularios del sistema (crear usuario, editar cliente, registrar prestamo, etc.).
 "use client";
 import type { ReactNode } from "react";
 

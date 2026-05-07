@@ -9,7 +9,6 @@ import {
   useForm,
   useWatch,
   type Control,
-  type UseFormRegisterReturn,
 } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, Check, Eye, EyeOff, Loader2, Save } from "lucide-react";
@@ -445,7 +444,7 @@ export default function NuevoUsuarioPage() {
             ) : (
               <Save className="h-4 w-4" />
             )}
-            {isSubmitting ? "Guardando..." : "Crear usuario"}
+            {isSubmitting ? "Guardando..." : "Crear Usuario"}
           </button>
         </div>
       </form>

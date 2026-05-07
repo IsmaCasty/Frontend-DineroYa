@@ -1,6 +1,8 @@
 // frontend/src/lib/api/client.ts
 import { tokenStorage } from '../auth/token-storage';
 import { API_URL, ENDPOINTS } from './endpoints';
+import type { ClienteDuplicadoError } from "./types/cliente.types";
+import type { CatalogoEnUsoError } from "./types/catalogo.types";
 
 // Error tipado que exponemos a los componentes.
 export class ApiError extends Error {
@@ -179,4 +181,32 @@ export async function apiRequest<T = unknown>(
   }
 
   return parsed as T;
+}
+
+// Devuelve el codigo de error si el backend lo incluyo en el body, o null
+// si el error fue genérico (por ejemplo, un 500 sin body estructurado).
+export function obtenerCodigoError(error: unknown): string | null {
+  if (!(error instanceof ApiError)) return null;
+  const body = error.raw as Record<string, unknown> | undefined;
+  if (!body || typeof body !== "object") return null;
+  const codigo = body["error"];
+  return typeof codigo === "string" ? codigo : null;
+}
+
+// Type guards para los 409 conocidos. Los usamos en los modales para
+// extraer el payload tipado sin castear a mano.
+export function esErrorClienteDuplicado(
+  error: unknown,
+): error is ApiError & { raw: ClienteDuplicadoError } {
+  if (!(error instanceof ApiError)) return false;
+  if (error.statusCode !== 409) return false;
+  return obtenerCodigoError(error) === "CLIENTE_DUPLICADO";
+}
+
+export function esErrorCatalogoEnUso(
+  error: unknown,
+): error is ApiError & { raw: CatalogoEnUsoError } {
+  if (!(error instanceof ApiError)) return false;
+  if (error.statusCode !== 409) return false;
+  return obtenerCodigoError(error) === "CATALOGO_EN_USO";
 }

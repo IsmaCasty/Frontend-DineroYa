@@ -6,14 +6,12 @@ import { useMemo, useState } from "react";
 import { Loader2, RefreshCw, Search, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { useUsuarios } from "@/lib/hooks/use-usuarios";
-import { useToast } from "@/lib/toast/use-toast";
 import { UsuariosTable } from "@/components/admin/usuarios-table";
 
 // Tipos del filtro de estado. "todos" muestra activos e inactivos.
 type FiltroEstado = "todos" | "activos" | "inactivos";
 
 export default function UsuariosPage() {
-  const { showToast } = useToast();
   const { usuarios, isLoading, error, refetch, actualizarUsuarioLocal } =
     useUsuarios();
 

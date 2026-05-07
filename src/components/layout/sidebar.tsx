@@ -107,7 +107,7 @@ export function Sidebar() {
       </div>
 
       {/* Contenido scrolleable: las secciones de navegacion */}
-      <nav className="flex-1 overflow-y-auto overflow-x-hidden py-3">
+      <nav className="flex-1 overflow-y-auto overflow-x-hidden py-3 sidebar-scroll">
         {SIDEBAR_SECTIONS.map((seccion) => {
           // Filtrar items visibles para el rol activo
           const itemsVisibles = seccion.items.filter((item) =>

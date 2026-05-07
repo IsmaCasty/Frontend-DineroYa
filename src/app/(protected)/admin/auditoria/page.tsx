@@ -4,7 +4,7 @@
 // Por defecto muestra las acciones de las ultimas 24 horas para que la primera carga sea rapida.
 "use client";
 import { useMemo, useState } from "react";
-import { Loader2, RefreshCw, Search } from "lucide-react";
+import { Loader2, RefreshCw } from "lucide-react";
 import { useAuditoria } from "@/lib/hooks/use-auditoria";
 import { useUsuarios } from "@/lib/hooks/use-usuarios";
 import {

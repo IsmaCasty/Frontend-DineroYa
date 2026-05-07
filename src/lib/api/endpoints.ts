@@ -25,7 +25,32 @@ export const ENDPOINTS = {
     auditoria: '/admin/auditoria',
   },
   // Sumar dentro del objeto ENDPOINTS:
-catalogos: {
-  cargos: "/catalogos/cargos",
-},
+  catalogos: {
+    cargos: "/catalogos/cargos",
+    
+    // Catalogos del Sprint 2.
+    // Localidades y Zonas son read-only, no exponen mutaciones desde el frontend.
+    localidades: "/catalogos/localidades",
+    zonas: "/catalogos/zonas",
+
+    // TipoJoya. CRUD completo, solo Admin lo usa salvo el GET.
+    tiposJoya: "/catalogos/tipos-joya",
+    tipoJoya: (id: number) => `/catalogos/tipos-joya/${id}`,
+    tipoJoyaReactivar: (id: number) => `/catalogos/tipos-joya/${id}/reactivar`,
+
+    // Kilate. CRUD completo (Admin) más endpoint dedicado de precio (Admin y Jefa).
+    kilates: "/catalogos/kilates",
+    kilate: (id: number) => `/catalogos/kilates/${id}`,
+    kilatePrecio: (id: number) => `/catalogos/kilates/${id}/precio-gramo`,
+    kilateReactivar: (id: number) => `/catalogos/kilates/${id}/reactivar`,
+  },
+
+  // Modulo de clientes. La mayoria son endpoints unicos, no funciones,
+  // porque las URLs base no cambian. Las que reciben id si son funciones.
+  clientes: {
+    base: "/clientes",
+    porId: (id: number) => `/clientes/${id}`,
+    historial: (id: number) => `/clientes/${id}/historial`,
+    reactivar: (id: number) => `/clientes/${id}/reactivar`,
+  },
 } as const;

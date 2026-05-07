@@ -10,6 +10,8 @@ import {
   UserCircle,
   UserCog,
   Users,
+  Diamond,
+  WeightTilde,
   type LucideIcon,
 } from "lucide-react";
 
@@ -68,14 +70,36 @@ export const SIDEBAR_SECTIONS: SidebarSection[] = [
         href: "/admin/auditoria",
         roles: [ROLES.ADMINISTRADOR, ROLES.JEFA],
       },
+      // Catalogos del Sprint 2.
+      // Tipos de joya: solo Admin (catalogo administrativo).
+      {
+        label: "Tipos de Joya",
+        icon: Gem,
+        href: "/admin/catalogos/tipos-joya",
+        roles: [ROLES.ADMINISTRADOR],
+      },
+      // Kilates: Admin y Jefa, porque la Jefa actualiza precios semanalmente.
+      // Internamente esconde botones de alta y desactivar para la Jefa, dejandole solo el de "actualizar precio".
+      {
+        label: "Kilates",
+        icon: WeightTilde,
+        href: "/admin/catalogos/kilates",
+        roles: [ROLES.ADMINISTRADOR, ROLES.JEFA],
+      },
     ],
   },
   {
     id: "operaciones",
     title: "Operaciones",
     items: [
-      { label: "Clientes", icon: UserCircle, comingSoon: true, sprint: 2 },
-      { label: "Joyas", icon: Gem, comingSoon: true, sprint: 2 },
+      // Visible para los tres roles (Admin, Jefa, Cajero).
+      {
+        label: "Clientes",
+        icon: UserCircle,
+        href: "/admin/clientes",
+      },
+      // Joyas todavia es comingSoon: se implementa en Sprint 3 junto con los prestamos, porque las joyas estan ligadas a contratos.
+      { label: "Joyas", icon: Diamond, comingSoon: true, sprint: 3 },
       { label: "Préstamos", icon: Coins, comingSoon: true, sprint: 3 },
       { label: "Pagos y Cobros", icon: Receipt, comingSoon: true, sprint: 4 },
     ],

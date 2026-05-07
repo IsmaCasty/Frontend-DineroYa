@@ -10,7 +10,8 @@ export const loginSchema = z.object({
     .max(20, { message: 'El usuario no puede superar 20 caracteres' }),
   password: z
     .string()
-    .min(1, { message: 'La contraseña es obligatoria' }),
+    .min(1, { message: 'La contraseña es obligatoria' })
+    .max(20, { message: 'La contraseña no puede superar 20 caracteres' }),
 });
 
 export type LoginInput = z.infer<typeof loginSchema>;

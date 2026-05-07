@@ -1,7 +1,6 @@
 /* Paleta Dinero Ya S.R.L. con modo claro y oscuro.
    El header y sidebar mantienen la identidad de marca (verde + dorado)
    en ambos modos. Los fondos de contenido si cambian con el tema. */
-
 @import "tailwindcss";
 
 /* Registrar la variante dark. Tailwind v4 no la trae por default.
@@ -149,4 +148,71 @@
       transform: translateX(0);
     }
   }
+}
+
+/* 
+   Scrollbars personalizados con la paleta del sistema.
+   Aplicamos en dos niveles:
+   1. Scrollbar global (toda la app): track claro, thumb gris con dorado al hover.
+   2. Scrollbar del sidebar: track verde oscuro, thumb dorado semi-transparente.
+      Se aplica via la clase utilitaria .sidebar-scroll en el <nav> del sidebar.
+   
+   Compatibilidad:
+   - Chrome, Edge, Safari: pseudo-elementos ::-webkit-scrollbar
+   - Firefox: scrollbar-width + scrollbar-color (CSS estandar)
+*/
+/* Scrollbar global de toda la aplicacion */
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--color-background, #baba4d);
+}
+
+*::-webkit-scrollbar-thumb {
+  /* Color base: usa el border-color para integrarse con cards y tablas */
+  background: var(--color-border, #d4d4d8);
+  border-radius: 5px;
+  /* Border crea un padding visual respecto al track */
+  border: 2px solid var(--color-background, #f5f5f4);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  /* Hover dorado: respeta la identidad de marca */
+  background: var(--color-header-accent, #c9a227);
+}
+
+/* Esquina donde se cruzan scrollbar horizontal y vertical */
+*::-webkit-scrollbar-corner {
+  background: var(--color-background, #f5f5f4);
+}
+
+/* Firefox: API estandar pero con menos control visual */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border, #d4d4d8) transparent;
+}
+
+/* Override especifico para el sidebar.
+   El sidebar tiene fondo verde oscuro propio (--color-header-bg), asi que
+   necesita un scrollbar diferente para integrarse visualmente. */
+.sidebar-scroll::-webkit-scrollbar-track {
+  background: var(--color-header-bg, #1a3a1a);
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  /* Dorado semi-transparente: visible sin saturar */
+  background: rgba(201, 162, 39, 0.4);
+  border: 2px solid var(--color-header-bg, #1a3a1a);
+  border-radius: 5px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--color-header-accent, #c9a227);
+}
+
+.sidebar-scroll {
+  scrollbar-color: rgba(201, 162, 39, 0.6) var(--color-header-bg, #1a3a1a);
 }

@@ -99,7 +99,8 @@ function FilaAuditoria({ item, expandida, onToggle }: FilaAuditoriaProps) {
                         )}
                     </button>
                 </td>
-                <td className="px-4 py-3 align-top text-xs text-muted-foreground">
+                <td className="px-4 py-3 text-sm"
+                    style={{ color: "var(--color-muted-foreground)" }}>
                     {formatearFechaHora(item.fechaAccion)}
                 </td>
                 <td className="px-4 py-3 align-top">

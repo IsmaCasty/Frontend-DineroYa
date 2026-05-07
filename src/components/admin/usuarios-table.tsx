@@ -19,6 +19,7 @@ import { EstadoBadge } from "@/components/ui/estado-badge";
 import { CargosCell } from "@/components/admin/cargos-cell";
 import { GestionarCargosModal } from "@/components/admin/gestionar-cargos-modal";
 import { ResetPasswordModal } from "@/components/admin/reset-password-modal";
+import { formatearFechaBolivia } from "@/lib/utils/fecha-bolivia";
 import type { UsuarioListItem } from "@/lib/api/types/usuario.types";
 
 interface UsuariosTableProps {
@@ -43,16 +44,6 @@ export function UsuariosTable({
   const [usuarioReset, setUsuarioReset] = useState<UsuarioListItem | null>(
     null,
   );
-
-  const formatearFecha = (iso: string): string => {
-    const d = new Date(iso);
-    if (isNaN(d.getTime())) return "—";
-    return d.toLocaleDateString("es-BO", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
-  };
 
   const toggleEstado = async (usuario: UsuarioListItem) => {
     if (user?.id === usuario.idCuenta) {
@@ -135,17 +126,19 @@ export function UsuariosTable({
                   key={u.idCuenta}
                   className="border-b transition-colors last:border-0 hover:bg-muted/50"
                 >
-                  <td className="px-4 py-3 font-mono text-xs">{u.userName}</td>
+                  <td className="px-4 py-3 text-sm font-medium">{u.userName}</td>
                   <td className="px-4 py-3">{u.nombreCompleto}</td>
-                  <td className="px-4 py-3 font-mono text-xs">{u.ci}</td>
+                  <td className="px-4 py-3 text-sm"
+                      style={{ color: "var(--color-muted-foreground)" }}>{u.ci}</td>
                   <td className="px-4 py-3">
                     <CargosCell cargos={u.cargosActivos} />
                   </td>
                   <td className="px-4 py-3">
                     <EstadoBadge activo={u.estado} />
                   </td>
-                  <td className="hidden px-4 py-3 text-xs text-muted-foreground lg:table-cell">
-                    {formatearFecha(u.fechaAlta)}
+                  <td className="px-4 py-3 text-sm"
+                      style={{ color: "var(--color-muted-foreground)" }}>
+                    {formatearFechaBolivia(u.fechaAlta)}
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-1">

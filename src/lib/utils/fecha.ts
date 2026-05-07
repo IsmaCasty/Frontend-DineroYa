@@ -126,11 +126,15 @@ export function formatearFechaHora(iso: string | null): string {
   if (!iso) return "—";
   const d = new Date(iso);
   if (isNaN(d.getTime())) return "—";
-  return d.toLocaleString("es-BO", {
+  // timeZone explicito: sin esto el navegador usa su zona local y si el
+  // usuario esta en UTC-8 por ejemplo, la hora sale completamente errada.
+  // "America/La_Paz" es UTC-4 todo el año (Bolivia no tiene horario de verano).
+  return new Intl.DateTimeFormat("es-BO", {
+    timeZone: "America/La_Paz",
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-  });
+  }).format(d);
 }
