@@ -100,10 +100,7 @@ export function TiposJoyaTabla({
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr
-                className="border-b text-xs uppercase tracking-wider"
-                style={{ color: "var(--color-muted-foreground)" }}
-              >
+              <tr className="border-b text-left border-gray-200 text-white dark:border-gray-700" style={{ backgroundColor: '#1a3a1a' }}>
                 <th className="px-4 py-3 text-center font-medium w-20">
                   ID
                 </th>

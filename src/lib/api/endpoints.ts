@@ -49,8 +49,24 @@ export const ENDPOINTS = {
   // porque las URLs base no cambian. Las que reciben id si son funciones.
   clientes: {
     base: "/clientes",
+    lista: "/clientes",
     porId: (id: number) => `/clientes/${id}`,
     historial: (id: number) => `/clientes/${id}/historial`,
     reactivar: (id: number) => `/clientes/${id}/reactivar`,
   },
+
+  // Modulo M3: Contratos y Prestamos
+contratos: {
+  calcular: "/contratos/calcular",
+  lista: "/contratos",
+  crear: "/contratos",
+  porId: (id: number) => `/contratos/${id}`,
+  // POST: anular contrato (RF-27); cajero solo puede anular el mismo dia y el suyo
+  anular: (id: number) => `/contratos/${id}/anular`,
+  // PATCH: agregar observacion interna (RF-29); solo Jefa y Admin
+  observaciones: (id: number) => `/contratos/${id}/observaciones`,
+  // POST: adjudicar contrato vencido (RF-17); solo Jefa y Admin
+  adjudicar: (id: number) => `/contratos/${id}/adjudicar`,
+  },
+
 } as const;

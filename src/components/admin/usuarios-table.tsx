@@ -101,10 +101,7 @@ export function UsuariosTable({
       <div className="overflow-x-auto rounded-lg border bg-card text-card-foreground">
         <table className="w-full text-sm">
           <thead>
-            <tr
-              className="border-b text-left"
-              style={{ backgroundColor: "var(--color-muted)" }}
-            >
+            <tr className="border-b text-left border-gray-200 text-white dark:border-gray-700" style={{ backgroundColor: '#1a3a1a' }}>
               <th className="px-4 py-3 font-semibold">Usuario</th>
               <th className="px-4 py-3 font-semibold">Nombre</th>
               <th className="px-4 py-3 font-semibold">CI</th>

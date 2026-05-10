@@ -12,6 +12,7 @@ import {
   Users,
   Diamond,
   WeightTilde,
+  FileText,
   type LucideIcon,
 } from "lucide-react";
 
@@ -98,6 +99,14 @@ export const SIDEBAR_SECTIONS: SidebarSection[] = [
         icon: UserCircle,
         href: "/admin/clientes",
       },
+      {
+        // Contratos y prestamos: accesible para todos los roles operativos
+        label: 'Contratos',
+        href: '/admin/contratos',
+        icon: FileText,
+        roles: [ROLES.ADMINISTRADOR, ROLES.JEFA, ROLES.CAJERO],
+      },
+
       // Joyas todavia es comingSoon: se implementa en Sprint 3 junto con los prestamos, porque las joyas estan ligadas a contratos.
       { label: "Joyas", icon: Diamond, comingSoon: true, sprint: 3 },
       { label: "Préstamos", icon: Coins, comingSoon: true, sprint: 3 },
