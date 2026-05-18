@@ -289,7 +289,7 @@ export default function NuevoContratoPage() {
               type="button"
               onClick={irAlSiguientePaso}
               className="flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold text-foreground transition-opacity hover:opacity-90"
-              style={{ backgroundColor: "#1a3a1a" }}
+              style={{ backgroundColor: "var(--color-header-accent)" }}
             >
               Siguiente
               <ArrowRight className="h-4 w-4" />

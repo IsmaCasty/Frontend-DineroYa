@@ -1,23 +1,24 @@
-// Definicion de las secciones e items del sidebar.
-// El filtrado por rol y el flag comingSoon se aplican en el componente.
 import {
-  BarChart3,
+  BarChart2,
+  CalendarDays,
   ClipboardList,
   Coins,
+  FileText,
   Gem,
+  Landmark,
   LayoutDashboard,
   Receipt,
+  RotateCcw,
   UserCircle,
   UserCog,
   Users,
-  Diamond,
   WeightTilde,
-  FileText,
+  ArrowLeftRight,
+  AlertCircle,
+  Bell,
   type LucideIcon,
 } from "lucide-react";
 
-// Constantes de roles. Coinciden con los nombres en BD (mayusculas por
-// el UppercaseSubscriber del backend). Centralizamos para evitar typos.
 export const ROLES = {
   ADMINISTRADOR: "ADMINISTRADOR",
   JEFA: "JEFE DE AGENCIA",
@@ -27,22 +28,16 @@ export const ROLES = {
 export type Role = (typeof ROLES)[keyof typeof ROLES];
 
 export interface SidebarItem {
-  // Etiqueta visible en el sidebar y en tooltip cuando esta colapsado.
   label: string;
   icon: LucideIcon;
-  // URL destino. Si es undefined, el item no es clickeable (proximamente).
   href?: string;
-  // Roles permitidos. Si es undefined, todos los roles ven el item.
   roles?: Role[];
-  // Marca el item como "Proximamente" (modulos no implementados aun).
   comingSoon?: boolean;
-  // Numero de sprint en que se implementara. Solo informativo.
   sprint?: number;
 }
 
 export interface SidebarSection {
   id: string;
-  // Titulo visible solo cuando el sidebar esta expandido.
   title: string;
   items: SidebarItem[];
 }
@@ -52,7 +47,14 @@ export const SIDEBAR_SECTIONS: SidebarSection[] = [
     id: "principal",
     title: "Principal",
     items: [
-      { label: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
+      {
+        // Apunta al nuevo dashboard rico con KPIs y gráficos (Sprint 5).
+        // Solo Admin y Jefa lo ven; el Cajero va directo a Cobros.
+        label: "Dashboard",
+        icon: LayoutDashboard,
+        href: "/admin/dashboard",
+        roles: [ROLES.ADMINISTRADOR, ROLES.JEFA],
+      },
     ],
   },
   {
@@ -71,16 +73,12 @@ export const SIDEBAR_SECTIONS: SidebarSection[] = [
         href: "/admin/auditoria",
         roles: [ROLES.ADMINISTRADOR, ROLES.JEFA],
       },
-      // Catalogos del Sprint 2.
-      // Tipos de joya: solo Admin (catalogo administrativo).
       {
         label: "Tipos de Joya",
         icon: Gem,
         href: "/admin/catalogos/tipos-joya",
         roles: [ROLES.ADMINISTRADOR],
       },
-      // Kilates: Admin y Jefa, porque la Jefa actualiza precios semanalmente.
-      // Internamente esconde botones de alta y desactivar para la Jefa, dejandole solo el de "actualizar precio".
       {
         label: "Kilates",
         icon: WeightTilde,
@@ -93,35 +91,80 @@ export const SIDEBAR_SECTIONS: SidebarSection[] = [
     id: "operaciones",
     title: "Operaciones",
     items: [
-      // Visible para los tres roles (Admin, Jefa, Cajero).
       {
         label: "Clientes",
         icon: UserCircle,
         href: "/admin/clientes",
       },
       {
-        // Contratos y prestamos: accesible para todos los roles operativos
-        label: 'Contratos',
-        href: '/admin/contratos',
-        icon: FileText,
+        label: "Contratos",
+        icon: Receipt,
+        href: "/admin/contratos",
         roles: [ROLES.ADMINISTRADOR, ROLES.JEFA, ROLES.CAJERO],
       },
-
-      // Joyas todavia es comingSoon: se implementa en Sprint 3 junto con los prestamos, porque las joyas estan ligadas a contratos.
-      { label: "Joyas", icon: Diamond, comingSoon: true, sprint: 3 },
-      { label: "Préstamos", icon: Coins, comingSoon: true, sprint: 3 },
-      { label: "Pagos y Cobros", icon: Receipt, comingSoon: true, sprint: 4 },
+      {
+        label: "Pagos y Cobros",
+        icon: Coins,
+        href: "/admin/cobros",
+      },
+      {
+        label: "Devoluciones",
+        icon: RotateCcw,
+        href: "/admin/devoluciones",
+      },
+      {
+        // Dashboard de alertas del Sprint 4: vencimientos y alertas pendientes.
+        // Sigue siendo útil para los tres roles como vista operativa rápida.
+        label: "Alertas",
+        icon: Bell,
+        href: "/dashboard",
+      },
     ],
   },
   {
-    id: "analitica",
-    title: "Análisis",
+    id: "caja",
+    title: "Caja",
     items: [
       {
-        label: "Reportes",
-        icon: BarChart3,
-        comingSoon: true,
-        sprint: 5,
+        label: "Caja y Arqueo",
+        icon: Landmark,
+        href: "/admin/caja",
+      },
+      {
+        label: "Tipo de Cambio",
+        icon: ArrowLeftRight,
+        href: "/admin/tipo-cambio",
+        roles: [ROLES.ADMINISTRADOR, ROLES.JEFA],
+      },
+      {
+        label: "Solicitudes",
+        icon: AlertCircle,
+        href: "/admin/solicitudes-efectivo",
+        roles: [ROLES.ADMINISTRADOR, ROLES.JEFA],
+      },
+    ],
+  },
+  {
+    id: "reportes",
+    title: "Reportes y Analítica",
+    items: [
+      {
+        // No se repite el Dashboard aquí; ya está en Principal.
+        label: "Reporte de Contratos",
+        icon: FileText,
+        href: "/admin/reportes/contratos",
+        roles: [ROLES.ADMINISTRADOR, ROLES.JEFA],
+      },
+      {
+        label: "Reporte de Cobros",
+        icon: BarChart2,
+        href: "/admin/reportes/pagos",
+        roles: [ROLES.ADMINISTRADOR, ROLES.JEFA],
+      },
+      {
+        label: "Reporte Diario",
+        icon: CalendarDays,
+        href: "/admin/reportes/diario",
         roles: [ROLES.ADMINISTRADOR, ROLES.JEFA],
       },
     ],

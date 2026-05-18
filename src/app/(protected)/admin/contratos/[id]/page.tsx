@@ -30,6 +30,8 @@ import {
   formatearFechaHoraBolivia,
 } from "@/lib/utils/fecha-bolivia";
 import type { ContratoDetalle } from "@/lib/api/types/contrato.types";
+import { tokenStorage } from "@/lib/auth/token-storage";
+import { PagoListadoItem } from "@/lib/api/types/pago.types";
 
 function fmt(n: number): string {
   return new Intl.NumberFormat("es-BO", {
@@ -50,6 +52,154 @@ function CampoInfo({
     <div>
       <p className="text-xs font-medium text-muted-foreground">{label}</p>
       <p className="text-sm text-foreground">{value}</p>
+    </div>
+  );
+}
+
+async function abrirContratoPdf(id: number, onError: (msg: string) => void) {
+  try {
+    const token = tokenStorage.getAccessToken();
+    const base = process.env.NEXT_PUBLIC_API_URL ?? '';
+    const res = await fetch(`${base}${ENDPOINTS.contratos.contratoPdf(id)}`, {
+      headers: { Authorization: `Bearer ${token ?? ''}` },
+    });
+    if (!res.ok) throw new Error('Error al obtener el PDF');
+    const blob = await res.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    window.open(objectUrl, '_blank');
+    setTimeout(() => URL.revokeObjectURL(objectUrl), 15000);
+  } catch {
+    onError('No se pudo abrir el PDF del contrato.');
+  }
+}
+
+// Carga y muestra los pagos reales del contrato.
+// Se define en el mismo archivo porque solo se usa aquí.
+function PagosContrato({ nroContrato }: { nroContrato: string }) {
+  const [pagos, setPagos] = useState<PagoListadoItem[]>([]);
+  const [cargando, setCargando] = useState(true);
+
+  useEffect(() => {
+    apiRequest<{ data: PagoListadoItem[]; total: number }>(
+      `${ENDPOINTS.pagos.lista}?nroContrato=${nroContrato}&limite=50`,
+    )
+      .then((r) => setPagos(r.data ?? []))
+      .catch(() => {})
+      .finally(() => setCargando(false));
+  }, [nroContrato]);
+
+  if (cargando) {
+    return (
+      <div className="rounded-lg border border-border bg-card p-4 text-center text-sm text-muted-foreground">
+        Cargando pagos...
+      </div>
+    );
+  }
+
+  if (pagos.length === 0) {
+    return (
+      <div className="rounded-lg border border-dashed border-border bg-card/50 p-6 text-center">
+        <p className="text-sm text-muted-foreground">
+          Este contrato no tiene pagos registrados.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="overflow-hidden rounded-lg border border-border">
+      <div
+        className="flex items-center justify-between px-4 py-3"
+        style={{ backgroundColor: '#1a3a1a' }}
+      >
+        <span className="text-sm font-semibold text-white">
+          Historial de Pagos del Contrato
+        </span>
+        <span
+          className="rounded-full px-2 py-0.5 text-xs font-bold"
+          style={{ backgroundColor: '#c9a227', color: '#0a0f0a' }}
+        >
+          {pagos.length}
+        </span>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b bg-muted/40">
+              {['Recibo', 'Tipo', 'Interés', 'Capital', 'Total', 'Moneda', 'Cajero', 'Fecha', 'Estado'].map(
+                (col) => (
+                  <th
+                    key={col}
+                    className="px-3 py-2.5 text-center text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+                  >
+                    {col}
+                  </th>
+                ),
+              )}
+            </tr>
+          </thead>
+          <tbody>
+            {pagos.map((p, idx) => (
+              <tr
+                key={p.idPago}
+                className={`border-b transition-colors last:border-b-0 hover:bg-muted/30 ${
+                  idx % 2 !== 0 ? 'bg-muted/10' : ''
+                } ${p.estado === 'ANULADO' ? 'opacity-50' : ''}`}
+              >
+                <td className="px-3 py-2.5 font-mono text-sm font-semibold">
+                  #{p.nroRecibo}
+                </td>
+                <td className="px-3 py-2.5 text-sm">
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                      p.tipoOperacion === 'CANCELACION'
+                        ? 'bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-400'
+                        : p.tipoOperacion === 'AMORTIZACION'
+                        ? 'bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400'
+                        : 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400'
+                    }`}
+                  >
+                    {p.tipoOperacion === 'PAGO_INTERES'
+                      ? 'Interés'
+                      : p.tipoOperacion === 'AMORTIZACION'
+                      ? 'Amortización'
+                      : 'Cancelación'}
+                  </span>
+                </td>
+                <td className="px-3 py-2.5 text-center tabular-nums text-sm">
+                  {fmt(p.montoInteres)}
+                </td>
+                <td className="px-3 py-2.5 text-center tabular-nums text-sm">
+                  {fmt(p.montoCapital)}
+                </td>
+                <td className="px-3 py-2.5 text-right tabular-nums text-sm font-semibold">
+                  {fmt(p.montoTotal)}
+                </td>
+                <td className="px-3 py-2.5 text-sm text-muted-foreground">
+                  {p.monedaPago}
+                </td>
+                <td className="px-3 py-2.5 text-sm text-muted-foreground">
+                  {p.cajeroNombre}
+                </td>
+                <td className="px-3 py-2.5 text-sm tabular-nums text-muted-foreground">
+                  {formatearFechaBolivia(p.fechaCreacion)}
+                </td>
+                <td className="px-3 py-2.5">
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                      p.estado === 'ANULADO'
+                        ? 'bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400'
+                        : 'bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-400'
+                    }`}
+                  >
+                    {p.estado}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
@@ -226,7 +376,7 @@ export default function ContratoDetallePage() {
               <p className="text-sm text-muted-foreground">
                 Agencia: {contrato.agencia.nombre}
                 {contrato.nroFolio && (
-                  <> &middot; Folio: {contrato.nroFolio}</>
+                  <> | Folio: {contrato.nroFolio}</>
                 )}
               </p>
             </div>
@@ -301,12 +451,15 @@ export default function ContratoDetallePage() {
             {/* Placeholder del comprobante PDF (Sprint 4) */}
             <button
               type="button"
-              disabled
-              className="flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium text-muted-foreground opacity-40"
-              title="Disponible en el siguiente sprint"
+              onClick={() =>
+                void abrirContratoPdf(contratoId, (msg) =>
+                  showToast(msg, 'error'),
+                )
+              }
+              className="flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-muted"
             >
               <FileText className="h-3.5 w-3.5" />
-              Imprimir PDF
+              Imprimir Contrato PDF
             </button>
           </div>
         </div>
@@ -440,14 +593,14 @@ export default function ContratoDetallePage() {
               </p>
             </div>
             <div className="rounded-md bg-muted/50 px-3 py-2 text-center">
-              <p className="text-xs text-muted-foreground">Linea Solicitada</p>
+              <p className="text-xs text-muted-foreground">Monto Solicitado:</p>
               <p className="text-lg font-bold text-foreground">
                 {fmt(contrato.lineaCredito.saldoLineaUsada)} BOB
               </p>
             </div>
             <div className="rounded-md bg-muted/50 px-3 py-2 text-center">
               <p className="text-xs text-muted-foreground">
-                Linea Disponible
+                Linea Disponible:
               </p>
               <p className="text-lg font-bold text-green-600 dark:text-green-400">
                 {fmt(contrato.lineaCredito.lineaDisponible)} BOB
@@ -461,7 +614,7 @@ export default function ContratoDetallePage() {
           <div className="flex items-center gap-2 px-4 py-3">
             <Gem className="h-4 w-4 text-muted-foreground" />
             <h3 className="text-sm font-semibold text-foreground">
-              Joyas en garantia ({contrato.joyas.length})
+              Joyas en Garantia ({contrato.joyas.length})
             </h3>
           </div>
           <div className="overflow-x-auto">
@@ -483,9 +636,9 @@ export default function ContratoDetallePage() {
                     Precio/g
                   </th>
                   <th className="px-4 py-2.5 text-right font-semibold">
-                    Prestamo
+                    Valor Prestamo
                   </th>
-                  <th className="px-4 py-2.5 text-right font-semibold">
+                  <th className="px-4 py-2.5 text-center font-semibold">
                     Tasacion
                   </th>
                   <th className="px-4 py-2.5 text-left font-semibold">
@@ -517,7 +670,7 @@ export default function ContratoDetallePage() {
                     <td className="px-4 py-2.5 text-right font-medium text-foreground">
                       {fmt(joya.valorPrestamo)} BOB
                     </td>
-                    <td className="px-4 py-2.5 text-right text-muted-foreground">
+                    <td className="px-4 py-2.5 text-center text-muted-foreground">
                       {fmt(joya.valorTasacion)} BOB
                     </td>
                     <td className="px-4 py-2.5 text-sm text-muted-foreground">
@@ -532,19 +685,15 @@ export default function ContratoDetallePage() {
 
         {/* Pagos: placeholder Sprint 4 */}
         <div className="rounded-lg border border-dashed border-border bg-card/50 p-6 text-center">
-          <p className="text-sm font-medium text-muted-foreground">
-            Historial de pagos
-          </p>
-          <p className="text-xs text-muted-foreground">
-            El registro y consulta de pagos se implementa en el Sprint 4.
-          </p>
+          {/* Historial de pagos reales del contrato */}
+          <PagosContrato nroContrato={contrato.nroContrato} />
         </div>
 
         {/* Observaciones internas */}
         {contrato.observaciones && (
           <div className="rounded-lg border border-border bg-card p-4">
             <h3 className="mb-2 text-sm font-semibold text-foreground">
-              Observaciones internas
+              Observaciones Internas:
             </h3>
             <p className="text-sm text-muted-foreground">
               {contrato.observaciones}
@@ -553,17 +702,17 @@ export default function ContratoDetallePage() {
         )}
 
         {/* Metadatos del registro */}
-        <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
+        <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
           <span>
             Creado: {formatearFechaHoraBolivia(contrato.fechaCreacion)}
           </span>
           <span>
             Actualizado:{" "}
-            {formatearFechaHoraBolivia(contrato.fechaActualizacion)}
+            {formatearFechaHoraBolivia(contrato.fechaActualizacion)}  
           </span>
           {contrato.motivoAnulacion && (
             <span className="text-red-600 dark:text-red-400">
-              Motivo anulacion: {contrato.motivoAnulacion}
+              Motivo Anulacion: {contrato.motivoAnulacion}
             </span>
           )}
         </div>

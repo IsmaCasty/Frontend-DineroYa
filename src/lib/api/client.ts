@@ -137,7 +137,11 @@ export async function apiRequest<T = unknown>(
   let resp = await fetch(url, {
     method,
     headers,
-    body: body !== undefined ? JSON.stringify(body) : undefined,
+    // Si body ya es string (JSON.stringify del caller), lo pasamos tal cual.
+    // Si es un objeto, lo stringificamos nosotros. Evita doble JSON.stringify.
+    body: body !== undefined
+      ? (typeof body === 'string' ? body : JSON.stringify(body))
+      : undefined, //1
   });
 
   // Auto-refresh si es 401, no hay skipAuth y no estamos en un endpoint de auth publico (login/refresh/logout) que podria causar loop.
@@ -158,7 +162,11 @@ export async function apiRequest<T = unknown>(
       resp = await fetch(url, {
         method,
         headers,
-        body: body !== undefined ? JSON.stringify(body) : undefined,
+        // Si body ya es string (JSON.stringify del caller), lo pasamos tal cual.
+        // Si es un objeto, lo stringificamos nosotros. Evita doble JSON.stringify.
+        body: body !== undefined
+          ? (typeof body === 'string' ? body : JSON.stringify(body))
+          : undefined, //2
       });
     }
   }

@@ -206,21 +206,18 @@ export default function DetalleClientePage() {
       <SeccionHistorial
         titulo="Prestamos y Contratos:"
         cantidad={prestamos.length}
-        sprint={3}
       />
 
       {/* Historial de pagos: placeholder Sprint 4 */}
       <SeccionHistorial
         titulo="Pagos y Cobros:"
         cantidad={pagos.length}
-        sprint={4}
       />
 
       {/* Historial de devoluciones: placeholder Sprint 4 */}
       <SeccionHistorial
         titulo="Devoluciones de Joyas:"
         cantidad={devoluciones.length}
-        sprint={4}
       />
     </div>
   );
@@ -268,10 +265,9 @@ function TarjetaResumen({ titulo, valor }: TarjetaResumenProps) {
 interface SeccionHistorialProps {
   titulo: string;
   cantidad: number;
-  sprint: number;
 }
 
-function SeccionHistorial({ titulo, cantidad, sprint }: SeccionHistorialProps) {
+function SeccionHistorial({ titulo, cantidad }: SeccionHistorialProps) {
   return (
     <section className="rounded-lg border bg-card p-6 text-card-foreground">
       <div className="flex items-center justify-between mb-4">
@@ -283,7 +279,6 @@ function SeccionHistorial({ titulo, cantidad, sprint }: SeccionHistorialProps) {
             color: "var(--color-muted-foreground)",
           }}
         >
-          Sprint {sprint}
         </span>
       </div>
       {cantidad === 0 ? (
@@ -291,13 +286,11 @@ function SeccionHistorial({ titulo, cantidad, sprint }: SeccionHistorialProps) {
           className="text-sm"
           style={{ color: "var(--color-muted-foreground)" }}
         >
-          Esta seccion se implementa en el Sprint {sprint}. Por ahora no hay
-          registros asociados a este cliente.
+          Por ahora no hay registros asociados a este cliente.
         </p>
       ) : (
         <p className="text-sm">
-          {cantidad} registro{cantidad !== 1 ? "s" : ""} disponible
-          {cantidad !== 1 ? "s" : ""}.
+          {cantidad} registro {cantidad !== 1 ? "s" : ""} asociado {cantidad !== 1 ? "s" : ""} a este cliente.
         </p>
       )}
     </section>

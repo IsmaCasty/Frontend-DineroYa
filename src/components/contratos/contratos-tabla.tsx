@@ -25,6 +25,19 @@ function formatMonto(monto: number, moneda: string): string {
   return `${formatted} ${moneda}`;
 }
 
+function calcularDiasVencimiento(fechaPago: string | Date): number {
+  // Misma lógica que el card de cobros: usar hora Bolivia (UTC-4) para "hoy"
+  const fechaStr =
+    typeof fechaPago === 'string'
+      ? fechaPago.split('T')[0]
+      : (fechaPago as Date).toISOString().split('T')[0];
+  const offsetBolivia = 4 * 60 * 60 * 1000;
+  const hoyStr = new Date(Date.now() - offsetBolivia).toISOString().split('T')[0];
+  const hoy = new Date(hoyStr + 'T00:00:00Z');
+  const venc = new Date(fechaStr + 'T00:00:00Z');
+  return Math.floor((venc.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24));
+}
+
 export function ContratosTabla({ contratos, isLoading }: ContratosTablaProps) {
   const router = useRouter();
 
@@ -116,7 +129,7 @@ export function ContratosTabla({ contratos, isLoading }: ContratosTablaProps) {
                     {formatearFechaBolivia(contrato.fechaPago)}
                 </p>
                 <DiasVencimientoBadge
-                    dias={contrato.diasHastaVencimiento}
+                    dias={calcularDiasVencimiento(contrato.fechaPago)}
                     estado={contrato.estado}
                 />
                 </td>

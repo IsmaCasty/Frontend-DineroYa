@@ -67,6 +67,63 @@ contratos: {
   observaciones: (id: number) => `/contratos/${id}/observaciones`,
   // POST: adjudicar contrato vencido (RF-17); solo Jefa y Admin
   adjudicar: (id: number) => `/contratos/${id}/adjudicar`,
+  
+  // PDF del contrato (implementado en Sprint 4, RF-25)
+  contratoPdf: (id: number) => `/contratos/${id}/pdf`,
   },
 
+  // Módulo M4: Pagos, Cobros, Devoluciones y Caja (Sprint 4)
+pagos: {
+  // Tipo de cambio
+  tipoCambioHoy: '/pagos/tipo-cambio/hoy',
+  tipoCambioHistorial: '/pagos/tipo-cambio',
+  tipoCambioCrear: '/pagos/tipo-cambio',
+  // Preview de cálculo sin persistir (RF-32)
+  calcular: '/pagos/calcular',
+
+  // CRUD de pagos
+  lista: '/pagos',
+  crear: '/pagos',
+  porId: (id: number) => `/pagos/${id}`,
+  // GET con query ?copia=true para reimpresión con leyenda "COPIA"
+  comprobante: (id: number) => `/pagos/${id}/comprobante`,
+  anular: (id: number) => `/pagos/${id}/anular`,
+
+  // Alertas (RF-36, RF-37, RF-38)
+  alertasDashboard: '/pagos/alertas/dashboard',
+  alertasLista: '/pagos/alertas',
+  alertaAtender: (id: number) => `/pagos/alertas/${id}/atender`,
+
+  // Devolución de joyas (RF-39, RF-40)
+  devolucionCrear: '/pagos/devoluciones',
+  devolucionComprobante: (id: number) => `/pagos/devoluciones/${id}/comprobante`,
+
+  // Caja (RF-41, RF-42, RF-43)
+  cajaAbrir: '/pagos/caja/abrir',
+  cajaArqueo: '/pagos/caja/arqueo',
+  cajaArqueoPdf: '/pagos/caja/arqueo/pdf',
+  cajaCerrar: '/pagos/caja/cerrar',
+  cajaSolicitudCrear: '/pagos/caja/solicitud-efectivo',
+  cajaSolicitudGestionar: (id: number) => `/pagos/caja/solicitud-efectivo/${id}`,
+  cajaTraspaso: '/pagos/caja/traspaso',
+  montoAperturaSugerido: (idCuentaEmpleado: number) => `/pagos/caja/monto-apertura-sugerido?idCuentaEmpleado=${idCuentaEmpleado}`,
+  },
+
+  // ─── Reportes (Sprint 5) ──────────────────────────────────────────────────────
+reportes: {
+  dashboard: '/reportes/dashboard',
+  cobrosChart: (dias: number) => `/reportes/dashboard/cobros-chart?dias=${dias}`,
+
+  contratos: '/reportes/contratos',
+  contratosExport: '/reportes/contratos/export',
+  contratosPdf: '/reportes/contratos/pdf',
+
+  pagos: '/reportes/pagos',
+  pagosExport: '/reportes/pagos/export',
+  pagosPdf: '/reportes/pagos/pdf',
+
+  diario: '/reportes/diario',
+  diarioExport: '/reportes/diario/export',
+  diarioPdf: '/reportes/diario/pdf',
+},
 } as const;
