@@ -462,7 +462,7 @@ export default function CajaPage() {
 
   // Modal abrir
   const [modalAbrir, setModalAbrir]     = useState(false);
-  const [idTarget, setIdTarget]         = useState<number | null>(null);
+  const [, setIdTarget]         = useState<number | null>(null);
 
   // Modal cerrar
   const [modalCerrar, setModalCerrar]   = useState(false);

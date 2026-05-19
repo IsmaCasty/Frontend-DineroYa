@@ -3,9 +3,10 @@
 // (blanco en modo claro, gris oscuro en modo oscuro), mientras que el fondo
 // verde del layout permanece constante.
 
+import { Suspense } from "react";
 import Image from "next/image";
 import { LoginForm } from "@/components/auth/login-form";
-// Metadata para el <title> del navegador y SEO basico.
+
 export const metadata = {
   title: "Iniciar sesion | Dinero Ya S.R.L.",
   description:
@@ -15,7 +16,6 @@ export const metadata = {
 export default function LoginPage() {
   return (
     <div className="mx-auto w-full max-w-md">
-      {/* Card principal del formulario */}
       <div
         className="relative overflow-hidden rounded-xl shadow-2xl"
         style={{
@@ -23,8 +23,6 @@ export default function LoginPage() {
           color: "var(--color-card-foreground)",
         }}
       >
-        {/* Banda dorada superior como acento de marca.
-            Es un detalle pequeno pero elegante, tipo "sello de oro". */}
         <div
           className="h-1.5 w-full"
           style={{
@@ -34,24 +32,22 @@ export default function LoginPage() {
         />
 
         <div className="px-8 py-10">
-          {/* Logo con anillo dorado alrededor */}
           <div className="mb-6 flex justify-center">
-              <div
-                className="rounded-full p-0.5"
-                style={{ backgroundColor: "var(--color-card)" }}
-              >
-                <Image
-                  src="/logo1.png"
-                  alt="Dinero Ya S.R.L."
-                  width={180}
-                  height={180}
-                  className="w-auto h-auto rounded-full"
-                  priority
-                />
-              </div>
+            <div
+              className="rounded-full p-0.5"
+              style={{ backgroundColor: "var(--color-card)" }}
+            >
+              <Image
+                src="/logo1.png"
+                alt="Dinero Ya S.R.L."
+                width={180}
+                height={180}
+                className="w-auto h-auto rounded-full"
+                priority
+              />
+            </div>
           </div>
 
-          {/* Titulos */}
           <div className="mb-8 text-center">
             <h1
               className="text-2xl font-bold tracking-tight"
@@ -67,17 +63,19 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* Formulario */}
-          <LoginForm />
+          {/* Suspense es obligatorio porque LoginForm usa useSearchParams().
+              El fallback es minimo porque el formulario carga casi instantaneo. */}
+          <Suspense fallback={<div className="h-40" />}>
+            <LoginForm />
+          </Suspense>
         </div>
       </div>
 
-      {/* Mensaje informativo bajo el card */}
       <p
         className="mt-6 text-center text-xs"
         style={{ color: "rgba(255, 255, 255, 0.6)" }}
       >
-       Sistema Web Integrado para la Gestión de Contratos, Cobros y Registro de Clientes
+        Sistema Web Integrado para la Gestión de Contratos, Cobros y Registro de Clientes
       </p>
     </div>
   );

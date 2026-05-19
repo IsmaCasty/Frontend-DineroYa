@@ -169,7 +169,7 @@ export default function ClientesPage() {
                 total={total}
                 pageSize={pageSize}
                 onPageChange={cambiarPagina}
-                onPageSizeChange={(nuevoSize) => {
+                onPageSizeChange={( ) => {
                 // El hook actual tiene pageSize fijo en 10. Por ahora ignoramos el cambio de pageSize desde el paginador 
                 // porque el hook no lo expone. En el siguiente turno cuando refactoricemos el hook
                 // para soportarlo lo conectamos. Por ahora el selector de cantidad queda visible pero sin efecto real.
