@@ -61,11 +61,10 @@ export function TcHistorialTabla({
                   'Compra BCB',
                   'Venta BCB',
                   'Venta Público',
-                  'Registrado por',
                 ].map((col) => (
                   <th
                     key={col}
-                    className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground"
+                    className="px-4 py-3 text-center   text-[11px] font-semibold uppercase tracking-wide text-muted-foreground"
                   >
                     {col}
                   </th>
@@ -76,7 +75,7 @@ export function TcHistorialTabla({
               {cargando && (
                 <tr>
                   <td
-                    colSpan={5}
+                    colSpan={4}
                     className="px-4 py-8 text-center text-sm text-muted-foreground"
                   >
                     Cargando historial...
@@ -87,7 +86,7 @@ export function TcHistorialTabla({
               {!cargando && (historial?.datos?.length ?? 0) === 0 && (
                 <tr>
                   <td
-                    colSpan={5}
+                    colSpan={4}
                     className="px-4 py-8 text-center text-sm text-muted-foreground"
                   >
                     No hay registros aún.
@@ -103,32 +102,28 @@ export function TcHistorialTabla({
                     }`}
                   >
                     {/* Fecha */}
-                    <td className="px-4 py-3 font-medium tabular-nums">
+                    <td className="px-4 py-3 font-medium tabular-nums text-center">
                     {formatFecha(item.fechaCambio)}
                   </td>
 
                     {/* Compra BCB */}
-                    <td className="px-4 py-3 tabular-nums text-muted-foreground">
+                    <td className="px-4 py-3 tabular-nums text-muted-foreground text-center">
                       {item.compraBCB.toFixed(2)}
                     </td>
 
                     {/* Venta BCB */}
-                    <td className="px-4 py-3 tabular-nums text-muted-foreground">
+                    <td className="px-4 py-3 tabular-nums text-muted-foreground text-center">
                       {item.ventaBCB.toFixed(2)}
                     </td>
 
                     {/* Venta Público: resaltado porque es el TC que se usa */}
                     <td
-                      className="px-4 py-3 tabular-nums font-semibold"
+                      className="px-4 py-3 tabular-nums font-semibold text-center"
                       style={{ color: '#c9a227' }}
                     >
                       {item.ventaPublico.toFixed(2)}
                     </td>
 
-                    {/* Quién lo registró */}
-                    <td className="px-4 py-3 text-xs text-muted-foreground">
-                      {item.registradoPor}
-                    </td>
                   </tr>
                 ))}
             </tbody>

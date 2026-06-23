@@ -4,8 +4,10 @@
 //  - Mobile drawer: 256px, oculto por default, abre con botón hamburguesa
 // Usa colores de marca (verde + dorado) en ambos modos del tema.
 "use client";
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { ChevronDown } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth/use-auth";
 import { useSidebar } from "@/lib/sidebar/use-sidebar";
@@ -27,6 +29,25 @@ export function Sidebar() {
   const { user } = useAuth();
   const { isCollapsed, isMobile, isMobileOpen, closeMobile } = useSidebar();
 
+  // Set vacío = todas las secciones expandidas por defecto.
+  // El accordion solo aplica cuando el sidebar está en modo 256px (expandido).
+  // En modo 64px (isCollapsed=true) siempre se muestran todos los iconos sin accordion.
+  const [seccionesColapsadas, setSeccionesColapsadas] = useState<Set<string>>(
+    new Set()
+  );
+
+  const toggleSeccion = (id: string) => {
+    setSeccionesColapsadas((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
   // Si por alguna razon no hay user, no renderizamos. El layout protegido
   // ya garantiza esto, pero mantenemos guard defensivo.
   if (!user) return null;
@@ -43,14 +64,12 @@ export function Sidebar() {
     ? "translate-x-0"
     : "-translate-x-full md:translate-x-0";
 
-    const partes = user.nombreCompleto.split(" ");
-    const nombres = partes.slice(0, 2).join(" ");     // primeros 2 → nombres
-    const apellidos = partes.slice(2).join(" ");  
+  const partes = user.nombreCompleto.split(" ");
+  const nombres = partes.slice(0, 2).join(" ");
+  const apellidos = partes.slice(2).join(" ");
+
   return (
     <aside
-      // Comportamiento responsive:
-      // - mobile: fixed con z-40 (encima del backdrop z-30)
-      // - desktop (md+): relative, parte del flex layout
       className={`
         fixed inset-y-0 left-0 z-40 flex w-64 flex-col
         md:sticky md:top-0 md:z-0 md:h-screen md:translate-x-0
@@ -69,15 +88,14 @@ export function Sidebar() {
       {/* Cabecera del sidebar: logo + nombre. En collapsed solo el logo. */}
       <div
         className={`flex h-16 shrink-0 gap-3 border-b px-4 items-center ${
-            isCollapsed ? "justify-center" : "justify-start px-4"
+          isCollapsed ? "justify-center" : "justify-start px-4"
         }`}
         style={{ borderColor: "var(--color-header-border)" }}
       >
         <div
-          className="rounded-full p-0.5 shrink-0 "
+          className="rounded-full p-0.5 shrink-0"
           style={{ backgroundColor: "var(--color-header-accent)" }}
         >
-        
           <Image
             src="/logo1.png"
             alt="Dinero Ya S.R.L."
@@ -87,7 +105,6 @@ export function Sidebar() {
             priority
           />
         </div>
-        {/* Nombre solo visible si NO esta colapsado en desktop, o si esta en mobile */}
         {(!isCollapsed || isMobile) && (
           <div className="flex flex-col leading-tight overflow-hidden">
             <span className="text-sm font-bold tracking-wide whitespace-nowrap">
@@ -109,38 +126,56 @@ export function Sidebar() {
       {/* Contenido scrolleable: las secciones de navegacion */}
       <nav className="flex-1 overflow-y-auto overflow-x-hidden py-3 sidebar-scroll">
         {SIDEBAR_SECTIONS.map((seccion) => {
-          // Filtrar items visibles para el rol activo
           const itemsVisibles = seccion.items.filter((item) =>
-            itemVisibleParaRol(item, rolActivo),
+            itemVisibleParaRol(item, rolActivo)
           );
 
-          // Si la seccion queda vacia tras el filtro, no la renderizamos
           if (itemsVisibles.length === 0) return null;
+
+          // En modo 64px el accordion no aplica: siempre mostramos los iconos.
+          const estaColapsada =
+            !isCollapsed && seccionesColapsadas.has(seccion.id);
 
           return (
             <div key={seccion.id} className="mb-4">
-              {/* Titulo de seccion visible solo si NO esta colapsado */}
+              {/* Titulo de seccion: botón clickeable cuando el sidebar está expandido */}
               {(!isCollapsed || isMobile) && (
-                <h3
-                  className="px-4 mb-1 text-[10px] font-semibold uppercase tracking-wider"
+                <button
+                  type="button"
+                  onClick={() => toggleSeccion(seccion.id)}
+                  className="w-full flex items-center justify-between px-4 mb-1 py-0.5 rounded transition-opacity hover:opacity-70"
                   style={{ color: "var(--color-header-muted)" }}
                 >
-                  {seccion.title}
-                </h3>
+                  <span className="text-[10px] font-semibold uppercase tracking-wider">
+                    {seccion.title}
+                  </span>
+                  <ChevronDown
+                    className="h-3 w-3 shrink-0 transition-transform duration-200"
+                    style={{
+                      transform: estaColapsada
+                        ? "rotate(-90deg)"
+                        : "rotate(0deg)",
+                    }}
+                  />
+                </button>
               )}
 
-              <ul className="space-y-0.5 px-2">
-                {itemsVisibles.map((item) => (
-                  <li key={item.label}>
-                    <SidebarLink
-                      item={item}
-                      pathname={pathname}
-                      isCollapsed={isCollapsed && !isMobile}
-                      onClickItem={isMobile ? closeMobile : undefined}
-                    />
-                  </li>
-                ))}
-              </ul>
+              {/* Items: se ocultan cuando la sección está colapsada.
+                  En modo 64px siempre visibles (sin accordion). */}
+              {!estaColapsada && (
+                <ul className="space-y-0.5 px-2">
+                  {itemsVisibles.map((item) => (
+                    <li key={item.label}>
+                      <SidebarLink
+                        item={item}
+                        pathname={pathname}
+                        isCollapsed={isCollapsed && !isMobile}
+                        onClickItem={isMobile ? closeMobile : undefined}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           );
         })}
@@ -152,23 +187,16 @@ export function Sidebar() {
         style={{ borderColor: "var(--color-header-border)" }}
       >
         <div className="flex items-center gap-3 overflow-hidden">
-          {/* Avatar circular con la inicial del usuario */}
           <div
             className="flex h-9 w-9 shrink-0 text-foreground items-center justify-center rounded-full text-sm font-bold"
-            style={{
-              backgroundColor: "var(--color-header-accent)",
-            }}
+            style={{ backgroundColor: "var(--color-header-accent)" }}
           >
             {user.userName.charAt(0).toUpperCase()}
           </div>
           {(!isCollapsed || isMobile) && (
             <div className="flex flex-col leading-tight overflow-hidden">
-              <span className="text-sm font-medium truncate">
-                {nombres}
-              </span>
-              <span className="text-sm font-medium truncate">
-                {apellidos}
-              </span>
+              <span className="text-sm font-medium truncate">{nombres}</span>
+              <span className="text-sm font-medium truncate">{apellidos}</span>
             </div>
           )}
         </div>
@@ -178,7 +206,6 @@ export function Sidebar() {
 }
 
 // Subcomponente: un item individual del sidebar.
-// Se separa para mantener la complejidad del Sidebar manejable.
 interface SidebarLinkProps {
   item: SidebarItem;
   pathname: string;
@@ -194,26 +221,19 @@ function SidebarLink({
 }: SidebarLinkProps) {
   const Icon = item.icon;
 
-  // Item activo: ruta actual coincide o empieza con el href del item.
-  // startsWith permite que rutas hijas (ej: /admin/usuarios/123) marquen
-  // como activo el item padre (/admin/usuarios).
   const isActive = item.href
     ? pathname === item.href || pathname.startsWith(item.href + "/")
     : false;
 
-  // Tooltip nativo cuando esta colapsado (title attribute).
-  // Cuando expandido, no necesita tooltip porque el texto esta visible.
   const tooltip = isCollapsed
     ? item.comingSoon
       ? `${item.label} (Sprint ${item.sprint})`
       : item.label
     : undefined;
 
-  // Estilos comunes de layout. La diferencia visual va en bgColor inline.
   const baseClasses =
     "group flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors";
 
-  // Item proximamente: render como div no clickeable, opacidad reducida.
   if (item.comingSoon || !item.href) {
     return (
       <div
@@ -240,16 +260,9 @@ function SidebarLink({
     );
   }
 
-  // Item activo: fondo dorado, texto verde oscuro (alto contraste).
-  // Item inactivo: hover dorado tenue, texto blanco semi.
   const linkStyle = isActive
-    ? {
-        backgroundColor: "var(--color-header-accent)",
-        color: "#0a0f0a",
-      }
-    : {
-        color: "rgba(255, 255, 255, 0.85)",
-      };
+    ? { backgroundColor: "var(--color-header-accent)", color: "#0a0f0a" }
+    : { color: "rgba(255, 255, 255, 0.85)" };
 
   return (
     <Link
@@ -259,7 +272,6 @@ function SidebarLink({
       className={baseClasses}
       style={linkStyle}
       onMouseEnter={(e) => {
-        // Hover solo si NO esta activo (el activo ya tiene fondo dorado).
         if (!isActive) {
           e.currentTarget.style.backgroundColor = "rgba(201, 162, 39, 0.15)";
           e.currentTarget.style.color = "#ffffff";

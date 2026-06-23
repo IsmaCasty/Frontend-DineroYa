@@ -5,9 +5,6 @@
 // - Intl es la API estándar oficial para internacionalización.
 // - timeZone le indica el huso a usar sin depender de la TZ del navegador del usuario, que podría estar en otro país.
 // - dateStyle/timeStyle son shortcuts que delegan al locale el formato preferido (en es-BO sale dd/mm/yyyy automaticamente).
-//
-// Documentación oficial:
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat
 
 const TIMEZONE_BOLIVIA = "America/La_Paz";
 const LOCALE_BOLIVIA = "es-BO";
@@ -42,8 +39,11 @@ const formatterFechaLarga = new Intl.DateTimeFormat(LOCALE_BOLIVIA, {
   minute: "2-digit",
 });
 
-// Recibe ISO string o Date. Si la entrada es invalida, devuelve "—" (em-dash) porque mostrar "Invalid Date" en pantalla queda muy feo y delata bugs.
-// El "—" es un placeholder neutro estandar en sistemas administrativos.
+// Recibe ISO string o Date. Devuelve null si es inválido.
+// IMPORTANTE: cuando el string es solo fecha YYYY-MM-DD (10 chars), JavaScript
+// lo parsea como UTC midnight. En Bolivia UTC-4, eso es el día anterior a las 20:00.
+// Solución: agregar T12:00:00Z (mediodía UTC = 08:00 Bolivia) para que Intl.DateTimeFormat
+// lo muestre siempre en el día correcto independientemente de la zona del navegador.
 function parsearODash(input: string | Date | null | undefined): Date | null {
   if (!input) return null;
   const fecha = typeof input === "string" ? new Date(input) : input;
@@ -62,6 +62,16 @@ export function formatearFechaHoraBolivia(
 export function formatearFechaBolivia(
   input: string | Date | null | undefined,
 ): string {
+  if (!input) return "—";
+  // Para strings YYYY-MM-DD: reformatear directamente sin construir Date.
+  // new Date('YYYY-MM-DD') lo parsea como UTC midnight, que en Bolivia (UTC-4)
+  // es el día anterior a las 20:00. Evitamos ese problema completamente.
+  if (typeof input === "string" && /^\d{4}-\d{2}-\d{2}$/.test(input)) {
+    const [y, m, d] = input.split("-");
+    return `${d}/${m}/${y}`;
+  }
+  // Para Date u otros formatos de string (con hora), sí usamos el Intl formateador
+  // porque la hora ya define el día correctamente.
   const fecha = parsearODash(input);
   if (!fecha) return "—";
   return formatterFecha.format(fecha);

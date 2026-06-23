@@ -18,6 +18,7 @@ import { apiRequest } from '@/lib/api/client';
 import { ENDPOINTS } from '@/lib/api/endpoints';
 import { useToast } from '@/lib/toast/use-toast';
 import { TcHistorialTabla } from '@/components/tipo-cambio/tc-historial-tabla';
+import { formatearFechaBolivia } from '@/lib/utils/fecha-bolivia';
 import type {
   TipoCambioHoy,
   TipoCambioListaResponse,
@@ -99,7 +100,7 @@ export default function TipoCambioPage() {
     setTcHoy('cargando');
     try {
       type Resp = TipoCambioHoy;
-      const data = await apiRequest<Resp>(ENDPOINTS.pagos.tipoCambioHoy);
+      const data = await apiRequest<Resp>(ENDPOINTS.pagos.tipoCambioVigente);
       setTcHoy(data);
     } catch {
       // 404 = no hay TC hoy. Cualquier otro error también muestra el form.
@@ -141,15 +142,15 @@ export default function TipoCambioPage() {
   const onSubmit = async (values: TcFormValues) => {
     setEnviando(true);
     try {
-      type Resp = TipoCambioHoy;
-      const nuevo = await apiRequest<Resp>(ENDPOINTS.pagos.tipoCambioCrear, {
+      // Solo necesitamos saber que el registro fue exitoso; recargamos esDeHoy llegue correctamente al estado.
+      await apiRequest<TipoCambioHoy>(ENDPOINTS.pagos.tipoCambioCrear, {
         method: 'POST',
         body: JSON.stringify(values),
       });
-      setTcHoy(nuevo);
       reset();
       showToast('Tipo de cambio registrado correctamente.', 'success');
-      // Recargar historial desde la primera página
+      // Recarga desde /vigente para que esDeHoy sea true y oculte el formulario.
+      await cargarTcHoy();
       setPagina(1);
       void cargarHistorial(1);
     } catch (e) {
@@ -207,7 +208,8 @@ export default function TipoCambioPage() {
           <TcHoyCard tcHoy={tcHoy} />
 
           {/* Formulario: solo si no hay TC hoy */}
-          {(tcHoy === null || (tcHoy !== 'cargando' && !tcHoy.yaUsadoEnPago)) && (
+          {(tcHoy === null ||
+            (tcHoy !== 'cargando' && (!tcHoy.esDeHoy || !tcHoy.yaUsadoEnPago))) && (
             <div className="rounded-lg border bg-card p-5 shadow-sm">
               <h2 className="mb-4 text-sm font-semibold text-foreground">
                 Registrar el Tipo de Cambio de Hoy
@@ -382,7 +384,7 @@ function TcHoyCard({ tcHoy }: TcHoyCardProps) {
           </p>
           <p className="flex items-center gap-1 text-xs text-muted-foreground">
             <CalendarDays className="h-3 w-3" />
-            {tcHoy.fechaCambio}
+            {formatearFechaBolivia(tcHoy.fechaCambio)}
           </p>
         </div>
         <span className="ml-auto flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-950/40 dark:text-green-400">

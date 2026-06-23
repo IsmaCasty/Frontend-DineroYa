@@ -16,10 +16,25 @@ import type {
   CalcularPrestamoInput,
 } from "@/lib/api/types/contrato.types";
 
+interface Kilate {
+  id: number;
+  kilate: number;
+  precioGramo: number;
+  estado: boolean;
+}
+
 interface PasoPrestamoProps {
   control: Control<ContratoFormValues>;
   register: UseFormRegister<ContratoFormValues>;
   errors: FieldErrors<ContratoFormValues>;
+  kilates: Kilate[];
+}
+
+function formatMonto(n: number): string {
+  return new Intl.NumberFormat('es-BO', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(n);
 }
 
 // Monedas hardcodeadas: el seeder siempre crea exactamente BOB y USD con estos IDs
@@ -34,7 +49,7 @@ const selectClass =
   "h-9 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring";
 const errorClass = "mt-1 text-xs text-red-600 dark:text-red-400";
 
-export function PasoPrestamo({ control, register, errors }: PasoPrestamoProps) {
+export function PasoPrestamo({ control, register, errors, kilates }: PasoPrestamoProps) {
   const { showToast } = useToast();
 
   // Estado del calculo: se actualiza solo en callbacks async (sin cascada)
@@ -50,6 +65,15 @@ export function PasoPrestamo({ control, register, errors }: PasoPrestamoProps) {
   const idMoneda = useWatch({ control, name: "idMoneda" });
   const diasPlazo = useWatch({ control, name: "diasPlazo" });
   const idMonedaNum = Number(idMoneda);
+  // Recalcula el monto máximo de las joyas del paso 2 para mostrarlo como referencia.
+  // Usa el mismo useWatch de joyas que ya existe arriba, no hace falta una nueva suscripción.
+  const montoMaximoLocal = (joyas ?? []).reduce((suma, joya) => {
+    if (!joya) return suma;
+    const kilate = kilates.find((k) => k.id === Number(joya.idKilate));
+    const precio = kilate?.precioGramo ?? 0;
+    const pesoNeto = Number(joya.pesoNeto) || 0;
+    return suma + pesoNeto * precio;
+  }, 0);
 
   const calcular = () => {
     // Validacion basica del cliente antes de la llamada al backend
@@ -212,20 +236,36 @@ export function PasoPrestamo({ control, register, errors }: PasoPrestamoProps) {
         </div>
       </div>
 
-      {/* Boton de calcular */}
-      <button
-        type="button"
-        onClick={calcular}
-        disabled={calcLoading}
-        className="flex items-center gap-2 rounded-md border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-50"
-      >
-        {calcLoading ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
-          <Calculator className="h-4 w-4" />
+     {/* Botón de calcular + banner de monto máximo: lado a lado */}
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={calcular}
+          disabled={calcLoading}
+          className="flex shrink-0 items-center gap-2 rounded-md border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-50"
+        >
+          {calcLoading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Calculator className="h-4 w-4" />
+          )}
+          {calcLoading ? "Calculando..." : "Calcular Vista Previa"}
+        </button>
+
+        {montoMaximoLocal > 0 && (
+          <div
+            className="flex flex-1 items-center justify-between rounded-lg border px-4 py-2"
+            style={{ borderColor: '#c9a227', backgroundColor: 'rgba(201, 162, 39, 0.06)' }}
+          >
+            <p className="text-sm font-medium text-muted-foreground">
+              MÁXIMO PRESTABLE (no ingreses más):
+            </p>
+            <p className="text-base font-bold tabular-nums" style={{ color: '#c9a227' }}>
+              {formatMonto(montoMaximoLocal)} BOB
+            </p>
+          </div>
         )}
-        {calcLoading ? "Calculando..." : "Calcular Vista Previa"}
-      </button>
+      </div>
 
       {/* Panel de resultado del calculo */}
       {calcResult && <PanelCalculoPreview calculo={calcResult} />}

@@ -136,11 +136,8 @@ export function PasoJoyas({
           style={{ borderColor: "#c9a227", backgroundColor: "transparent" }}
         >
           <div>
-            <p className="text-xs font-medium text-muted-foreground">
-              MONTO MÁXIMO PRESTABLE:
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Cálculo Estimado
+            <p className="text-sm font-medium text-muted-foreground">
+              MONTO MÁXIMO PRESTABLE (Cálculo Estimado):
             </p>
           </div>
           <p

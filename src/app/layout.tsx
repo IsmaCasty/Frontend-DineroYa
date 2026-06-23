@@ -8,7 +8,7 @@ import { ThemeProvider } from "@/lib/theme/theme-context";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: 'Dinero Ya S.R.L. | Sistema de Gestion',
+  title: 'Dinero Ya S.R.L. | Sistema de Gestión',
   description:
     'Sistema Web Integrado para la Gestión de Contratos, Cobros y Registro de Clientes',
 };

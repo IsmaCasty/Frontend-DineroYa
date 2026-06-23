@@ -76,6 +76,7 @@ contratos: {
 pagos: {
   // Tipo de cambio
   tipoCambioHoy: '/pagos/tipo-cambio/hoy',
+  tipoCambioVigente: '/pagos/tipo-cambio/vigente',
   tipoCambioHistorial: '/pagos/tipo-cambio',
   tipoCambioCrear: '/pagos/tipo-cambio',
   // Preview de cálculo sin persistir (RF-32)

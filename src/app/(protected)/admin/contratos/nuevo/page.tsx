@@ -268,6 +268,7 @@ export default function NuevoContratoPage() {
                 control={control}
                 register={register}
                 errors={errors}
+                kilates={kilates}
             />
             )}
         </div>

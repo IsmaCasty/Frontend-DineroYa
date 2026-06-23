@@ -2,7 +2,7 @@
 // Reflejan exactamente los DTOs que devuelve el backend.
 
 // ===== TIPO DE CAMBIO =====
-// Lo que devuelve GET /pagos/tipo-cambio/hoy
+// Lo que devuelve GET /pagos/tipo-cambio/vigente (y también /hoy para compatibilidad)
 export interface TipoCambioHoy {
   id: number;
   idMoneda: number;
@@ -13,6 +13,9 @@ export interface TipoCambioHoy {
   // true = ya se usó en un pago del día, no puede modificarse.
   yaUsadoEnPago: boolean;
   estado: string;
+  // true = el TC es del día de hoy (Bolivia). false = es de un día anterior.
+  // Solo lo devuelve el endpoint /vigente; en /hoy siempre es implícitamente true.
+  esDeHoy: boolean;
 }
 
 // Lo que devuelve GET /pagos/tipo-cambio (historial paginado)
@@ -23,7 +26,6 @@ compraBCB: number;
 ventaBCB: number;
 ventaPublico: number;
 estado: string;
-registradoPor: string; // nombre del empleado
 }
 export interface TipoCambioListaResponse {
   datos: TipoCambioItem[];   // era 'data', el backend devuelve 'datos'
