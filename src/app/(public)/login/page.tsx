@@ -8,7 +8,7 @@ import Image from "next/image";
 import { LoginForm } from "@/components/auth/login-form";
 
 export const metadata = {
-  title: "Iniciar sesion | Dinero Ya S.R.L.",
+  title: "Iniciar Sesión | Dinero Ya S.R.L.",
   description:
     "Ingrese al Sistema Web Integrado de gestion de contratos, cobros y registro de clientes de Dinero Ya S.R.L.",
 };

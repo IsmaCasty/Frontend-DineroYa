@@ -14,10 +14,8 @@ import { AlertasCountCards } from '@/components/dashboard/alertas-count-cards';
 import { ContratosUrgentesTabla } from '@/components/dashboard/contratos-urgentes-tabla';
 import type {
   AlertaDashboardResponse,
-  AlertaItem,
 } from '@/lib/api/types/pago.types';
 
-type AlertasListaMinima = { data: Pick<AlertaItem, 'id'>[] };
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -52,36 +50,16 @@ export default function DashboardPage() {
   const manejarAlertaAtendida = useCallback(
     async (idContrato: number, nota: string) => {
       try {
-        const alertas = await apiRequest<AlertasListaMinima>(
-          `${ENDPOINTS.pagos.alertasLista}?idContrato=${idContrato}&estado=PENDIENTE&porPagina=10&pagina=1`,
+        await apiRequest(
+          ENDPOINTS.pagos.alertaAtenderContrato(idContrato),
+          {
+            method: 'PATCH',
+            body: JSON.stringify(
+              nota.trim() ? { nota: nota.trim() } : {},
+            ),
+          },
         );
-
-        if (alertas.data.length === 0) {
-          showToast(
-            'Este contrato no tiene alertas pendientes registradas.',
-            'info',
-          );
-          return;
-        }
-
-        const notaTrimmed = nota.trim();
-        await Promise.all(
-          alertas.data.map((alerta) =>
-            apiRequest(ENDPOINTS.pagos.alertaAtender(alerta.id), {
-              method: 'PATCH',
-              body: JSON.stringify(
-                notaTrimmed ? { nota: notaTrimmed } : {},
-              ),
-            }),
-          ),
-        );
-
-        const cantidad = alertas.data.length;
-        showToast(
-          `${cantidad} alerta${cantidad !== 1 ? 's' : ''} marcada${cantidad !== 1 ? 's' : ''} como atendida${cantidad !== 1 ? 's' : ''}.`,
-          'success',
-        );
-
+        showToast('Contrato marcado como atendido.', 'success');
         void cargarDashboard();
       } catch (e) {
         showToast(

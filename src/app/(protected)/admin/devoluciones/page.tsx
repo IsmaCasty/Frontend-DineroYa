@@ -359,7 +359,7 @@ export default function DevolucionesPage() {
                 type="button"
                 onClick={() =>
                   void abrirPdfProtegido(
-                    ENDPOINTS.pagos.devolucionComprobante(resultado.nroDevolucion),
+                    ENDPOINTS.pagos.devolucionComprobante(contratoSeleccionado?.id ?? 0),
                     (msg) => showToast(msg, 'error'),
                   )
                 }

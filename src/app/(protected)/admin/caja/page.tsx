@@ -92,6 +92,9 @@ function FilaCaja({
       <td className="py-2 px-3 text-right font-mono text-xs">{fUsd(caja.totalCobradoUsd)}</td>
       <td className="py-2 px-3 text-right font-mono text-xs">{fBob(caja.totalPrestadoBob)}</td>
       <td className="py-2 px-3 text-right font-mono text-xs">{fUsd(caja.totalPrestadoUsd)}</td>
+      <td className="py-2 px-3 text-right font-mono text-xs text-amber-600 dark:text-amber-400">
+        {fBob(caja.solicitudesAprobadasBob)}
+      </td>
       <td className="py-2 px-3 text-right">
         {caja.estado === 'CERRADO' && (
           <>
@@ -612,6 +615,22 @@ const handleConfirmarApertura = async (idTarget: number) => {
             <p className="text-xs text-muted-foreground uppercase">Prestado USD</p>
             <p className="text-xl font-bold text-foreground mt-1">{fUsd(arqueo.totalPrestadoUsdGlobal)}</p>
           </div>
+          <div className="bg-card border border-border rounded-lg p-4 border-t-4 border-t-amber-400">
+            <p className="text-xs text-muted-foreground uppercase">Solicitudes BOB</p>
+            <p className="text-xl font-bold text-foreground mt-1">
+              {fBob(arqueo.totalSolicitudesBobGlobal)}
+            </p>
+            <p className="text-xs text-muted-foreground mt-0.5">Efectivo aprobado hoy</p>
+          </div>
+          {arqueo.totalSolicitudesUsdGlobal > 0 && (
+            <div className="bg-card border border-border rounded-lg p-4 border-t-4 border-t-amber-300">
+              <p className="text-xs text-muted-foreground uppercase">Solicitudes USD</p>
+              <p className="text-xl font-bold text-foreground mt-1">
+                {fUsd(arqueo.totalSolicitudesUsdGlobal)}
+              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">Efectivo aprobado hoy</p>
+            </div>
+          )}
         </div>
       )}
 
@@ -665,6 +684,7 @@ const handleConfirmarApertura = async (idTarget: number) => {
                   <th className="text-right py-3 px-3 text-xs font-semibold uppercase">Cobrado USD</th>
                   <th className="text-right py-3 px-3 text-xs font-semibold uppercase">Prestado BOB</th>
                   <th className="text-right py-3 px-3 text-xs font-semibold uppercase">Prestado USD</th>
+                  <th className="text-right py-3 px-3 text-xs font-semibold uppercase">Solicitudes BOB</th>
                   <th className="text-right py-3 px-3 text-xs font-semibold uppercase">Diferencia</th>
                   <th className="py-3 px-3" />
                 </tr>
@@ -674,7 +694,7 @@ const handleConfirmarApertura = async (idTarget: number) => {
                   ? arqueo.cajas
                   : arqueo.cajas.filter((c) => c.idCuentaEmpleado === user?.id)
                 ).map((caja) => (
-                  <FilaCaja key={caja.id} caja={caja} onCerrar={handleClickCerrar} />
+                  <FilaCaja key={caja.idArqueo} caja={caja} onCerrar={handleClickCerrar} />
                 ))}
               </tbody>
             </table>

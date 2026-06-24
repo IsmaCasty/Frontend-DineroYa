@@ -94,6 +94,8 @@ pagos: {
   alertasDashboard: '/pagos/alertas/dashboard',
   alertasLista: '/pagos/alertas',
   alertaAtender: (id: number) => `/pagos/alertas/${id}/atender`,
+  alertaAtenderContrato: (idContrato: number) =>
+  `/pagos/alertas/contrato/${idContrato}/atender`,
 
   // Devolución de joyas (RF-39, RF-40)
   devolucionCrear: '/pagos/devoluciones',

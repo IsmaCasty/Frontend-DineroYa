@@ -179,7 +179,7 @@ export function LoginForm() {
           }
         >
           {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-          {isSubmitting ? 'Ingresando...' : 'Iniciar sesion'}
+          {isSubmitting ? 'Ingresando...' : 'Iniciar Sesión'}
         </button>
       </form>
     );

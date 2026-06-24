@@ -209,22 +209,27 @@ valorTasacion: number;
 // Los campos legacy (montoInicialCaja, totalPrestado, etc.) siguen en BD como 0
 // en registros nuevos, por eso se mantienen como opcionales aquí.
 export interface CajaArqueo {
-  id: number;
+  idArqueo: number;
   idCuentaEmpleado: number;
-  estado: 'ABIERTO' | 'CERRADO'; 
+  estado: 'ABIERTO' | 'CERRADO';
   fechaApertura: string;
   fechaCierre: string | null;
-  // Nuevas columnas Sprint 5 (separadas por moneda)
   montoInicialCajaBob: number;
   montoInicialCajaUsd: number;
   totalPrestadoBob: number;
   totalPrestadoUsd: number;
   totalCobradoBob: number;
   totalCobradoUsd: number;
-  montoReportadoBob: number;
-  montoReportadoUsd: number;
-  diferenciaBob: number;
-  diferenciaUsd: number;
+  // Solicitudes de efectivo aprobadas hoy (dinero que ingresó físicamente)
+  solicitudesAprobadasBob: number;
+  solicitudesAprobadasUsd: number;
+  montoEsperadoBob: number;
+  montoEsperadoUsd: number;
+  montoReportadoBob: number | null;
+  montoReportadoUsd: number | null;
+  diferenciaBob: number | null;
+  diferenciaUsd: number | null;
+  observaciones: string | null;
 }
 
 export interface ArqueoResponse {
@@ -234,6 +239,8 @@ export interface ArqueoResponse {
   totalPrestadoUsdGlobal: number;
   totalCobradoBobGlobal: number;
   totalCobradoUsdGlobal: number;
+  totalSolicitudesBobGlobal: number;
+  totalSolicitudesUsdGlobal: number;
 }
 
 // Sprint 5: el monto ya no lo ingresa el usuario.
